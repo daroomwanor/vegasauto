@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dispatcher</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/623f7f7009.js" crossorigin="anonymous"></script>
+</head>
+<body class="w3-content w3-black" style="max-width:100%">
+<!-- First Grid: Logo & About -->
+
+<div class="w3-row" style="background-color: black;" id="home">
+  <a onclick="reloadDispatchDashboard();" class="w3-btn w3-round w3-orange" style="position: fixed; !important; background-color:yellow;"><i class='fa fa-home' style='font-size:24px'></i></a>
+  <input type="hidden" id="staffId">
+  <img src="/static/logo.png" style="float: right;margin-top:0px; height: 135px; width:200px;">
+  <table class="w3-table w3-center" id="login" style="">
+  	<tr>
+  		<td><input type="email" id="email" placeholder="Email"></td>
+  	</tr>
+  	<tr>
+  		<td><input type="password" id="password" placeholder="Password"></td>
+  	</tr>
+  	<tr>
+  		<td><button onclick="authStaff()">Login</button></td>
+  	</tr>
+  </table>
+  
+</div>
+<div style="float:right;color: lime;" id="timer"></div>
+<!-- Second Grid: Services -->
+<div class="w3-row" style="margin-top: 40px;" id="main">
+  
+</div>
+
+<div id="smsModal" class="w3-modal">
+  <div class="w3-modal-content" style="color: black;">
+    <div class="w3-container">
+      <span onclick="document.getElementById('smsModal').style.display='none'"
+      class="w3-button w3-display-topright">&times;</span>
+      <div id="modalContent">
+      	<table>
+      		<tr>
+      			<td>Client: <span id="client"> </span></td>
+      		</tr>
+      		<tr>
+      			<td>Phone: <span id="phone_no"> </span></td>
+      		</tr>
+      		<tr>
+      			<td>Message Type: <span id="headerType"> </span></td>
+      		</tr>
+      		<tr>
+      			<td>Custom Message: </td>
+      		</tr>
+      		<tr>
+      			 <td><textarea id="custom_msg" style="width:300px; height:200px;"></textarea></td>
+      		</tr>
+      		<tr>
+      			<td><button onclick="pushSMSAction()" class="w3-btn w3-round w3-blue">Push Message</button></td><td><button onclick="document.getElementById('smsModal').style.display='none'" class="w3-btn w3-round w3-red">Cancel</button></td>
+      		</tr>
+
+      	</table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="resetPasswordModal" class="w3-modal">
+  <div class="w3-modal-content" style="color: black;">
+    <div class="w3-container">
+      <div id="modalContent">
+      	<h4>Reset Password</h4>
+      	<table>
+      		<tr>
+      			<td>Password : <input type="password" id="re_password"></td>
+      		</tr>
+      		<tr>
+      			<td>Re-Enter : <input type="password" id="re_enter"></td>
+      		</tr>
+      		<tr>
+      			 <td><button onclick="savePassword()" class="w3-button w3-blue">Save</button></td>
+      		</tr>
+      	</table>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript">
+	setInterval(myTimer, 1000);
+	function myTimer() {
+		const d = new Date();
+		document.getElementById("timer").innerHTML = d.toLocaleTimeString();
+	}
+
+	function savePassword() {
+		var pass = true;
+		var password = document.getElementById("re_password").value;
+		var re_enter = document.getElementById("re_enter").value;
+
+
+		 if(password.length < 8 ){
+		 	alert("Please Enter Atleast 8 Characters");
+		 	pass = false;
+		 }
+
+		 if (password != re_enter){
+		 	alert("passwords Must Match");
+		 	pass = false;
+		 }
+		 var data = {
+		 	password:password
+		 }
+		 if (pass == true){
+		 	const xhttp = new XMLHttpRequest();
+			xhttp.open("POST", "http://192.168.0.3:5000/savePasswordAction?staffId="+document.getElementById('staffId').value);
+			xhttp.send(JSON.stringify(data));
+			document.getElementById('resetPasswordModal').style.display = "None";
+			window.location.href="http://192.168.0.3:5000/dispatcher";
+
+		 }
+
+	}
+
+	function getPromoPage() {
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("main").innerHTML = xhttp.responseText;
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/promo?staffId="+document.getElementById("staffId").value);
+		xhttp.send();
+
+	}
+	function pushNotification() {
+		var msgType = document.getElementById("msgType").value;
+		var name = document.getElementById("name").value;
+		var phone = document.getElementById("phone").value;
+		var msgBody = document.getElementById("msgBody").value;
+		var promo_discount = document.getElementById("promo_discount").value;
+		var promo_code = document.getElementById("promo_code").value;
+		var data = {
+			name:name,
+			phone: phone,
+			msgBody:msgBody,
+			msgType:msgType,
+			promo_discount: promo_discount,
+			promo_code:promo_code
+		}
+		if(phone != ""){
+			const xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					window.location.href="http://192.168.0.3:5000/promo";
+			    }
+			}
+			xhttp.open("POST", "http://192.168.0.3:5000/promo");
+			xhttp.send(JSON.stringify(data));
+		}
+	}
+
+	function checkPasswordReset(staffId){
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				if (xhttp.responseText == "Yes"){
+					document.getElementById('resetPasswordModal').style.display = "Block";
+				}
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/checkPasswordReset?staffId="+staffId);
+		xhttp.send();
+	}
+
+	function authStaff(){
+		var email = document.getElementById('email').value;
+		var password = document.getElementById('password').value;
+		var data  = {
+			email:email,
+			password:password
+		}
+		console.log(data);
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				var resp = JSON.parse(xhttp.responseText);
+				if (resp['records'].length > 0 ){
+					document.getElementById('login').style.display = "None";
+					console.log(resp['records'][0]['Id']);
+					var staffId = resp['records'][0]['Id'];
+					document.getElementById("staffId").value = staffId;
+					checkPasswordReset(resp['records'][0]['Id']);
+					reloadDispatchDashboard();
+				}else{
+					document.getElementById('main').innerHTML = resp['data'];
+				}
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/authorizeStaff?email="+email+"&password="+password);
+		xhttp.send();
+	}
+
+	function asssignJobToStaff(e) {
+		var confId = e.getAttribute('data-record');
+		var staffId = document.getElementById("staffId").value;
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				reloadDispatchDashboard();
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/assignJobToStaff?staffId="+staffId+"&confId="+confId);
+		xhttp.send();
+	}
+
+	function unlinkJobToStaff(e) {
+		var confId = e.getAttribute('data-record');
+		var staffId = document.getElementById("staffId").value;
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				reloadDispatchDashboard();
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/unlinkJobToStaff?staffId="+staffId+"&confId="+confId);
+		xhttp.send();
+	}
+
+	function reloadDispatchDashboard(){
+		var staffId = document.getElementById("staffId").value;
+		const xhttp = new XMLHttpRequest();
+		document.getElementById("main").innerHTML = "LOADING";
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("main").innerHTML = xhttp.responseText;
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/dispatchDashboard?staffId="+staffId);
+		xhttp.send();
+	}
+
+	function manageBooking(e) {
+		var bookingId = e.getAttribute('data-record');
+		var staffId = document.getElementById("staffId").value;
+		document.getElementById("main").innerHTML = "LOADING";
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById('main').innerHTML = xhttp.responseText;
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/manageBookingAction?staffId="+staffId+"&bookingId="+bookingId);
+		xhttp.send();
+	}
+
+	function generateInvoice(e) {
+		var bookingId = e.getAttribute('data-record');
+		var staffId = document.getElementById("staffId").value;
+		document.getElementById("main").innerHTML = "LOADING";
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById('main').innerHTML = xhttp.responseText;
+		    }
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/generateInvoiceAction?staffId="+staffId+"&bookingId="+bookingId);
+		xhttp.send();
+	}
+
+	function pushSMS() {
+		var bookingId = document.getElementById('bookingId').value;
+		var staffId = document.getElementById('staffId').value;
+		var msgType = document.getElementById('msgType').value;
+		var msgBody = document.getElementById('msgBody').value;
+		var phone = document.getElementById('phone').value;
+		var time = document.getElementById('time').value;
+		var address = document.getElementById('address').value;
+		var name = document.getElementById('name').value;
+		var data = {
+			bookingId:bookingId,
+			staffId:staffId,
+			msgType:msgType,
+			msgBody:msgBody,
+			phone:phone,
+			time:time,
+			address:address
+		}
+		document.getElementById("smsModal").style.display = "Block";
+
+		document.getElementById("client").innerHTML = name ;
+		document.getElementById("phone_no").innerHTML = phone;
+		document.getElementById("headerType").innerHTML = msgType;
+		document.getElementById("custom_msg").value = msgBody;
+		
+	}
+
+	function pushSMSAction() {
+		var bookingId = document.getElementById('bookingId').value;
+		var staffId = document.getElementById('staffId').value;
+		var msgType = document.getElementById('msgType').value;
+		var msgBody = document.getElementById('msgBody').value;
+		var phone = document.getElementById('phone').value;
+		var time = document.getElementById('time').value;
+		var address = document.getElementById('address').value;
+		var data = {
+			bookingId:bookingId,
+			staffId:staffId,
+			msgType:msgType,
+			msgBody:document.getElementById("custom_msg").value,
+			phone:phone,
+			time:time,
+			address:address
+		}
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("smsModal").style.display = "None";
+				reloadDispatchDashboard();
+			} 
+		}
+		xhttp.open("POST", "http://192.168.0.3:5000/pushSMSMessageAction");
+		xhttp.send(JSON.stringify(data));
+
+	}
+
+
+	function sendPaymentLink(){
+		var phone = document.getElementById("send_phone_no").value;
+		var payment_total = document.getElementById('payment_total').innerHTML;
+		var bookingId = document.getElementById('bookingId').value;
+		var staffId = document.getElementById('staffId').value;
+		var data  = {
+			payment_total:payment_total,
+			bookingId:bookingId,
+			phone:phone
+		}
+		console.log(data);
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("invoiceModal").style.display = "None";
+				document.getElementById("modalContent").innerHTML = "";
+				reloadDispatchDashboard();
+		    }
+		}
+		xhttp.open("POST", "http://192.168.0.3:5000/generatePaymentLink");
+		xhttp.send(JSON.stringify(data));
+	}
+
+	function addService() {
+		document.getElementById('addService').style.display = "Block";
+		document.getElementById('addBtn').style.display = "None";
+		document.getElementById('actionBtns').style.display = "Block";
+	}
+
+	function cancelBtn(){
+		document.getElementById('addService').style.display = "None";
+		document.getElementById('addBtn').style.display = "Block";
+		document.getElementById('actionBtns').style.display = "None";
+
+	}
+
+	function insertIntoInvoice(){
+		var staffId = document.getElementById('staffId').value;
+		var bookingId = document.getElementById('bookingId').value;
+		var name = document.getElementById('name').value;
+		var price = document.getElementById('price').value;
+		var qty	 = document.getElementById('qty').value;
+		data = {
+			name:name,
+			price:price,
+			qty:qty,
+			staffId:staffId,
+			bookingId:bookingId
+		}
+		if (name != ""){
+			const xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					document.getElementById("main").innerHTML = "LOADING";
+					const xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function() {
+						if (this.readyState == 4 && this.status == 200) {
+							document.getElementById('main').innerHTML = xhttp.responseText;
+					    }
+					}
+					xhttp.open("GET", "http://192.168.0.3:5000/generateInvoiceAction?staffId="+staffId+"&bookingId="+bookingId);
+					xhttp.send();
+			    }
+			    console.log(JSON.stringify(data)); 
+			}
+			xhttp.open("POST", "http://192.168.0.3:5000/addToInvoice");
+			xhttp.send(JSON.stringify(data));
+		}
+	}
+
+
+	function deleteInvoiceItem(e){
+		var invoiceId = e.getAttribute('data-record');
+		var staffId = document.getElementById('staffId').value;
+		var bookingId = document.getElementById('bookingId').value;
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("main").innerHTML = "LOADING";
+				const xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						document.getElementById('main').innerHTML = xhttp.responseText;
+				    }
+				}
+				xhttp.open("GET", "http://192.168.0.3:5000/generateInvoiceAction?staffId="+staffId+"&bookingId="+bookingId);
+				xhttp.send();
+		    }
+		    console.log(JSON.stringify(data)); 
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/deleteInvoice?invoiceId="+invoiceId);
+		xhttp.send();
+	}
+
+	function generateCustomerInvoice(){
+		var bookingId = document.getElementById("bookingId").value;
+		const xhttp = new XMLHttpRequest();
+		xhttp.onreadystatechange = function() {
+			if (this.readyState == 4 && this.status == 200) {
+				document.getElementById("invoiceModal").style.display = "Block";
+				document.getElementById("modalContent").innerHTML = xhttp.responseText;
+			} 
+		}
+		xhttp.open("GET", "http://192.168.0.3:5000/getCustomerInvoice?bookingId="+bookingId);
+		xhttp.send();
+
+	}
+
+	
+
+</script>
+
+</body>
+</html>

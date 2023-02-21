@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Las Vegas Auto Spa</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Amatic+SC">
+	<script src="https://kit.fontawesome.com/623f7f7009.js" crossorigin="anonymous"></script>
+</head>
+<body class="w3-container" style="color: white;background-color: black;">
+	<input type="hidden" id="current_day" value="{{today}}">
+	<input type="hidden" id="discount" value="{{discount}}">
+	<input type="hidden" id="promo_code" value="{{code}}">
+	<input type="hidden" id="staffId" value="{{staffId}}">
+	<input type="hidden" id="promoId" value="{{promoId}}">
+	<input type="hidden" id="partner" value="{{partner}}">
+	<div class="w3-display-container w3-black" style="margin-top:235px;">
+		<div class="w3-display-middle" style=" height: 500px; width:409px; padding-top: 15px; padding-left: 15px; background-color:#3f3e3e; border-radius: 5px;">
+			{% if "member" in display %}
+				<h5>Membership Booking Service</h5>
+			{% endif %}
+		<div>
+			<table style="width:350px;">
+				<tr>
+					<td><a class="w3-btn w3-round w3-orange" href="/"><i class="fa fa-arrow-left"></i> Back</a></td>
+					<td><i class="fas fa-calendar-alt w3-xx-large"></i></td>
+					<td>
+						<select style="width:250px;" class="w3-select" id ="month" onchange="changeCalendarView()">
+							<option value="{{month}}">{{yearObj[month]}}</option>
+							<option value="2">Feb</option>
+							<option value="3">Mar</option>
+							<option value="4">Apr</option>
+							<option value="5">May</option>
+							<option value="6">Jun</option>
+							<option value="7">Jul</option>
+							<option value="8">Aug</option>
+							<option value="9">Sep</option>
+							<option value="10">Oct</option>
+							<option value="11">Nov</option>
+							<option value="12">Dec</option>
+						</select>
+
+					</td>
+				</tr>
+			</table>
+			
+			<table style="width:350px;">
+				<tr>
+					<td>S</td><td>M</td><td>T</td><td>W</td><td>T</td><td>F</td><td>S</td>
+				</tr>
+				<tr>
+				{% for x in data %}
+					{% if x['day'] in active_days %}
+						<td style="background-color: white; color: black;" class="weekday" onclick="setWeekday(this)" data-record="{{x['day']}}">{{x['day']}}</td>
+						{% if x['index'] in end %}
+							</tr>
+							<tr>
+						{% endif %}
+					{% else %}
+						<td  style="background-color: gray;" data-record="{{x['day']}}">{{x['day']}}</td>
+						{% if x['index'] in end %}
+							</tr>
+							<tr>
+						{% endif %}
+					{% endif %}
+
+				{% endfor %}
+				</tr>
+			</table>
+		</div>
+		<div>
+			<div style="display: inline-block;overflow: auto;white-space: nowrap;overflow-x: auto; width:350px;">
+				<h6>Select Day and Time</h6>
+				<table id="timeSlot">
+					
+				</table>
+			</div>
+			<table style="margin-top:20px;">
+				<tr>
+					<td>
+						<select class="w3-select" id="auto_type">
+							<option value="">Vehicle Type</option>
+							<option value="Sedan">Sedan</option>
+							<option value="SUV">SUV</option>
+							<option value="Semi-Truck"> Semi Truck</option>
+							<option value="Trucks"> Trucks/Commercial</option>
+							<option value="Other">Other</option>
+						</select>
+					</td>
+					<td>
+						<select class="w3-select" class="w3-input" id="service" onchange="serviceTerm()">
+							<option value="BASIC">Basic (starting $65)</option>
+							<option value="GOLD">Gold (starting $85)</option>
+							<option value="PLATINUM">Platinum (starting $120)</option>
+							<option value="DIAMOND">Diamond (starting $200)</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<select class="w3-select" id ="number">
+							<option value="1"># Vehicles</option>
+							<option value="1">1</option>
+							<option value="2">2</option>
+							<option value="3">3</option>
+							<option value="4">4</option>
+							<option value="5">5</option>
+							<option value="More">More</option>												
+						</select>
+					</td>
+					<td>
+						<select class="w3-select" id="clientType">
+							<option>One Time</option>
+							<option>Membership Club (20% OFF)</option>
+						</select>
+						
+					</td>
+				</tr>
+				{% if "promo" in display %}
+					<tr>
+						<td><input class="w3-input" type="text" id="promo_code" placeholder="PROMO CODE" value="{{code}}"> </td><td><button class="w3-button w3-blue">PROMO CODE ({{discount}}% OFF)</button></td>
+					</tr>
+				{% endif %}
+				<tr>
+					<td><input class="w3-input" type="text" id="firstname" placeholder="Firstname"></td><td><input class="w3-input" type="text" id="lastname" placeholder="Lastname"></td>
+				</tr>
+				<tr>
+					<td><input class="w3-input" type="text" id="phone" placeholder="Phone"></td><td><input class="w3-input" type="text" id="email" placeholder="Email"></td>
+
+				</tr>
+				<tr>
+					<td>
+						<select class="w3-select" id ="city">
+							<option value="Las Vegas">Las Vegas</option>
+							<option value="Henderson">Henderson</option>					
+						</select>
+					</td>
+					<td>
+						<select onchange="getPartnership()" class="w3-select" id="properties">
+							<option>Affiliate Property</option>
+							<option value="Allure">Allure</option>
+							<option value="Auric">Auric</option>
+							<option value="Parc_Haven">Parc Haven</option>
+						</select>
+					</td>
+				</tr>
+				
+			</table>
+			<table>
+				<tr>
+					<td>
+						<textarea id="street" class="w3-textarea" style="width:390px;">Street Address</textarea>
+					</td>
+				</tr>
+			</table>
+			<button class="w3-btn w3-round w3-teal" onclick="bookNow()">Book Now</button>
+			<div id="serviceTermModal" class="modal" style="height:115% !important;">
+				  <!-- Modal content -->
+				  <div class="modal-content" style="border-radius: 8px;font-size: 12px;">
+					<div class="modal-header" style="border-radius: 8px; color:#e49607;height: 45px;text-align: center;font-size: medium;padding-top: 12px;">
+						<span onclick="document.getElementById('serviceTermModal').style.display='None'" class="close">Las Vegas Auto Spa LLC <span style="font-size:12px;" id="serviceTypeHeader"></span></span>
+					</div>
+					<div class="modal-body w3-black" style="margin-top:2px; color: #e49607;">
+						<div id="content" style="background-color:black !important;">
+							<h1>Loading</h1>
+						</div>						
+					</div>
+				</div>	  
+			</div>
+			<img src="/static/500X500.png"  style="width:200px; position: absolute;margin-left:110px">
+		</div>
+		<script type="text/javascript">
+
+			var weekday ="None";
+			var data;
+			var book_time ="None";
+			var partner = document.getElementById('partner').value;
+			var prop = document.getElementById('properties');
+			var option = document.createElement("option");
+			if (partner != "None"){
+   				option.text = partner;
+   				prop.innerHTML = "";
+   				prop.add(option, prop[0]);
+			}
+			function getAvaliability(month,day){
+				const xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+				       document.getElementById("timeSlot").innerHTML = xhttp.responseText;
+				    } 
+				}
+				xhttp.open("GET", "http://192.168.0.3:5000/getTimeSlot?month="+month+"&day="+day+"&partner="+partner);
+				xhttp.send();
+			}
+			function setTimeSlot(e){
+				book_time = e.getAttribute('data-record');
+				all_time = document.getElementsByClassName('all_time');
+				for (var x=0; x<all_time.length; x++){
+					all_time[x].style.backgroundColor= "WHITE";
+				}
+				e.style.backgroundColor = "Blue";
+
+			}
+			function setWeekday(e){
+				weekday = e.getAttribute('data-record');
+				var month = document.getElementById("month").value;
+				all_days = document.getElementsByClassName('weekday');
+				for (var x=0; x<all_days.length; x++){
+					all_days[x].style.backgroundColor= "WHITE";
+				}
+				e.style.backgroundColor = "#b662d3";
+				getAvaliability(month, weekday);
+			}
+
+			function validate(data){
+				var resp = "True";
+				if(weekday == "None" || book_time == "None"){
+					alert("Please Select Date and Time For Your Appionment");
+					resp = "False";
+				}
+				if(data['auto_type'] == "" && data['service'] == ""){
+					alert("Please Select A Vehicle Type and Preferred Service");
+					resp = "False";
+				}
+
+				if(data['email'] == "" || data['phone'] == ""){
+					alert('Please Enter An Email Or Phone Number');
+					resp = "False";
+				}
+				return resp;
+			}
+			function bookNow(){
+				var month = document.getElementById("month").value;
+				var day = weekday;
+				var time = book_time;
+				var auto_type = document.getElementById("auto_type").value;
+				var service = document.getElementById("service").value;
+				var firstname = document.getElementById("firstname").value;
+				var lastname = document.getElementById("lastname").value;
+				var phone = document.getElementById("phone").value;
+				var email = document.getElementById("email").value;
+				var city  = document.getElementById("city").value;
+				var street = document.getElementById("street").value;
+				var number = document.getElementById("number").value;
+				var clientType = document.getElementById("clientType").value;
+				var discount = document.getElementById("discount").value;
+				var promo_code = document.getElementById("promo_code").value;
+				var staffId = document.getElementById("staffId").value;
+				var property = document.getElementById("properties").value;
+				if (document.getElementById("promoId").value == "None"){
+					var promoId = "a06Dn000001NZOkIAO";
+				}else{
+					var promoId = document.getElementById("promoId").value
+				}
+
+				data = {
+					month : month,
+					day : day,
+					time : time,
+					auto_type : auto_type,
+					service: service,
+					firstname:firstname,
+					lastname:lastname,
+					phone:phone,
+					email:email,
+					city:city,
+					street:street,
+					number:number,
+					clientType:clientType,
+					promo_code:promo_code,
+					promo_discount: discount,
+					promoId: promoId,
+					staffId:staffId,
+					property:property
+				}
+				console.log(data);
+				var resp = validate(data);
+				if (resp == "True"){
+					insertNewBooking(data);
+				}
+
+
+			}
+
+			function insertNewBooking(data){
+				document.getElementById("content").innerHTML= "Loading";
+				document.getElementById("serviceTermModal").style.display = "Block";
+				const xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+				       document.getElementById("content").innerHTML = xhttp.responseText;
+				    } 
+				}
+				xhttp.open("POST", "http://192.168.0.3:5000/insertNewBooking");
+				xhttp.send(JSON.stringify(data));
+			}
+
+			function changeCalendarView(){
+				window.location.href = "https://arielapps.com/booking?month="+document.getElementById("month").value+'&promo=promo&code='+document.getElementById("promo_code").value+'&discount='+document.getElementById("discount").value;
+			}
+			function serviceTerm(){
+				var service = document.getElementById("service").value;
+				const xhttp = new XMLHttpRequest();
+				if (service != ""){
+					document.getElementById("content").innerHTML= "Loading";
+					document.getElementById("serviceTermModal").style.display = "Block";
+					document.getElementById("serviceTypeHeader").innerHTML = "("+service+" Package)";
+					xhttp.onreadystatechange = function() {
+						if (this.readyState == 4 && this.status == 200) {
+					       document.getElementById("content").innerHTML = xhttp.responseText;
+					    } 
+					}
+					xhttp.open("GET", "http://192.168.0.3:5000/getServiceType?type="+service);
+					xhttp.send();
+				}
+
+			}
+
+			function getPartnership() {
+				var queryString = window.location.search;
+				if (queryString == ""){
+					queryString = "?";
+				} 
+				window.location.href = queryString+"&partner="+document.getElementById("properties").value;
+			}
+				
+		</script>
+
+		<style type="text/css">
+			
+			/* The Modal (background) */
+			.modal {
+			  display: none; /* Hidden by default */
+			  position: fixed; /* Stay in place */
+			  z-index: 1; /* Sit on top */
+			  padding-top: 100px; /* Location of the box */
+			  left: 0;
+			  top: 0;
+			  width: 100%; /* Full width */
+			  height: 100%; /* Full height */
+			  overflow: auto; /* Enable scroll if needed */
+			  background-color: rgb(0,0,0); /* Fallback color */
+			  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+			}
+
+			/* Modal Content */
+			.modal-content {
+			  position: relative;
+			  background-color: #fefefe;
+			  margin: auto;
+			  padding: 0;
+			  border: 1px solid #888;
+			  width: 80%;
+			  box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+			  -webkit-animation-name: animatetop;
+			  -webkit-animation-duration: 0.4s;
+			  animation-name: animatetop;
+			  animation-duration: 0.4s
+			}
+
+			/* Add Animation */
+			@-webkit-keyframes animatetop {
+			  from {top:-300px; opacity:0} 
+			  to {top:0; opacity:1}
+			}
+
+			@keyframes animatetop {
+			  from {top:-300px; opacity:0}
+			  to {top:0; opacity:1}
+			}
+
+		</style>
+
+		</div>
+
+</html>

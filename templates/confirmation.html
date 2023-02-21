@@ -1,0 +1,57 @@
+<html>
+	<head>
+	<title>Dispatcher</title>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script src="https://kit.fontawesome.com/623f7f7009.js" crossorigin="anonymous"></script>
+	</head>
+	<body class="w3-content w3-black" style="max-width:100%">
+		<div style="border-radius:5px; color: #e49607; background-color: black;">
+			<img src="/static/logo.png" style="margin-top:0px; height: 100px; width:150px;">
+			<table class="w3-table w3-black w3-table-all" style="color:#e49607 !important;">
+				<tr>
+					<td>Thank You For Choosing Las Vegas Auto Spa LLC. <span id="info"> {{message}}</span></td>
+
+				</tr>
+				<tr>
+					<td>Booking for: {{data['Name']}}</td>
+					
+				</tr>
+				<tr>
+					<td> Email: {{data['Email__c']}} </td>
+				</tr>
+				<tr>
+					<td> Phone: {{data['Phone__c']}} </td>
+				</tr>
+				<tr>
+					<td>Date/Time: {{timeZone[time]}} {{yearObj[month]}} {{ data['Weekday__c']}}th</td>
+				</tr>
+				<tr>
+					<td>Address: {{data['Address__c']}}</td>			
+				</tr>
+				<tr>
+					<td>City: {{data['City__c']}}</td>
+				<tr>
+					<td>Vehicle Type: {{data['Vehicle_Type__c']}}</td>			
+				</tr>
+				<tr>
+					<td>Preferred Service : {{data['Services__c']}}</td>			
+				</tr>
+				<tr>
+					<td> #. Vehicles: {{data['Vehicle_No__c']}}</td>
+				</tr>
+				<tr>
+					<td> Client Type : {{data['clientType__c']}}</td>
+				</tr>
+				<tr>
+					<td><button class="w3-button w3-round w3-teal" onclick='window.location.href = "https://arielapps.com/booking?member=member"'>Join Membership Club</button> <button class="w3-button w3-round w3-orange" onclick='window.location.href = "https://arielapps.com/"'>Done</button></td>
+				</tr>
+			</table>
+			<img src="/static/500X500.png"  style="width:200px; position: absolute;margin-left:110px">
+		</div>
+	</body>
+</html
+		

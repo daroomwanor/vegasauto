@@ -1,0 +1,90 @@
+<div class="">
+	<span>
+		Welcome {{staffInfo[0]['Firstname__c']}} {{staffInfo[0]['Lastname__c']}}
+	</span>
+	<select style="float:right;">
+		<option value="Weekday__C">Day</option>
+		<option value="Month__c">Week</option>
+		<option value="Month__c">Month</option>
+	</select>
+	<div class="">
+		<input type="hidden" id="staffId" value="{{staffId}}">
+		<table>
+			<tr>
+				<td>
+					<h3>Dispatch Dashboard</h3>
+				</td>
+				<td onclick="getPromoPage()" >
+					<a href="/promotions?staffId={{staffInfo[0]['Id']}}" class="w3-btn w3-round w3-red"><i class="fa-regular fa-comment w3-large"></i> Send PROMO</a>
+				</td>
+			</tr>
+		</table>
+		
+		<table class="w3-table" style="max-width: 100%; font-size: 12px;">
+			<tr>
+				<td>Confirmed</td>
+				<td>Date/Time</td>
+				<td>Status</td>
+				<td>Add/Remove/Manage/Invoice/dispatch</td>
+			</tr>
+			{% for x in bookings: %}
+				<tr>
+					<td>
+						{{x['Name']}}
+					</td>
+					<td>
+						{% set date = x['Bookings__r']['Weekday__c'] | int %}
+						{% set month = x['Bookings__r']['Month__c'] | int %}
+						{{timeZone[x['Bookings__r']['Time__c']]}} {{yearObj[month]}} {{date}}
+					</td>
+					<td>{{x['Status__c']}}</td>
+					<td>
+						<span style="font-size:8px;" class="w3-button w3-round w3-orange w3-small" data-record="{{x['Id']}}" onclick="unlinkJobToStaff(this)" ><i class="fas fa-user-alt-slash"></i></span>
+					
+					    <span style="font-size:8px;" class="w3-button w3-round w3-orange w3-small" data-record="{{x['Bookings__c']}}" onclick="manageBooking(this)" ><i class="fa-regular fa-comment"></i></span>
+					
+					    <span style="font-size:8px;" class="w3-button w3-round w3-orange w3-small" data-record="{{x['Bookings__c']}}" onclick="generateInvoice(this)" ><i class="fas fa-wallet"></i></span>
+					</td>
+				</tr>
+			{% endfor %}
+
+			{% for x in all_bookings: %}
+				{% if x['Staffs__c'] == staffId %}
+				{% else: %}
+					<tr>
+						<td>
+							{{x['Name']}}
+						</td>
+						<td>
+							{% set date = x['Bookings__r']['Weekday__c'] | int %}
+							{% set month = x['Bookings__r']['Month__c'] | int %}
+							{{timeZone[x['Bookings__r']['Time__c']]}} {{yearObj[month]}} {{date}} 
+						</td>
+						<td>{{x['Status__c']}}</td>
+						<td><button class="w3-btn w3-round w3-orange" data-record="{{x['Id']}}" onclick="asssignJobToStaff(this)" ><i class="fas fa-user-plus"></i></button></td>
+					</tr>
+				{% endif %}
+
+			{% endfor %}
+		</table>
+	</div>
+	<div style="background-color: black;">
+		<table class="" style="background-color:black;width: 20%; font-size:12px;">
+			<tr style="background-color:black;">
+				<td>Open</td> <td> <span class="w3-badge w3-gray">0</span></td>
+			</tr>
+			<tr>
+				<td>Assigned</td> <td> <span class="w3-badge  w3-gray">0</span></td>
+			</tr>
+			<tr>
+				<td>In Progress</td> <td> <span class="w3-badge  w3-gray">0</span></td>
+			</tr>
+			<tr>
+				<td>Pending</td> <td> <span class="w3-badge  w3-gray">0</span></td>
+			</tr>
+			<tr>
+				<td>Completed</td> <td> <span class="w3-badge  w3-gray">0</span></td>
+			</tr>
+		</table>
+	</div>
+</div>

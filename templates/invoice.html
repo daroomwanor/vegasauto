@@ -1,0 +1,92 @@
+
+<input type="hidden" id="bookingId" value="{{bookingId}}">
+<input type="hidden" id="staffId" value="{{staffId}}">
+<div>
+	
+	<img src="/static/logo.png" style="margin-top:0px; height: 100px; width:150px;">
+	<table class="w3-table">
+		<tr>
+			<td>Invoice: {{booking['Name']}} </td>
+			<td style="display:block;" id="addBtn" >
+				<button onclick="addService()" class="w3-btn w3-round w3-teal"><i class="fa fa-add"></i></button>
+			</td>
+		</tr>
+	</table>
+	<table class="w3-table">
+		<tr id="addService" style="display:None;">
+			<td><input class="w3-input w3-round" type="text" id="name"></td>
+			<td>
+				<select class="w3-select w3-round" id="qty">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
+			</td>
+			<td >
+				<input class="w3-input w3-round" type="text" id="price">
+			</td>
+			<td id="actionBtns">
+				<button id="updateBtn" onclick="insertIntoInvoice()" class="w3-btn w3-round w3-blue"><i class="fa fa-add"></i> Save</button>
+				<button id="cancelBtn" onclick="cancelBtn()" class="w3-btn w3-round w3-red"><i class="fa fa-cancel"></i> Cancel</button>
+			</td>
+		</tr>
+		<tr>
+			<td>Items</td><td>QTY</td><td>Price</td><td></td>
+		</tr>
+		
+		{% for x in invoiceItem %}
+			<tr>
+				<td>{{x['Name']}}</td>
+				<td>
+					<select>
+						<option value="{{x['Quantity__c']}}"> {{x['Quantity__c']}}</option>
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+					</select>
+				</td>
+				<td>{{x['Price__c']}}</td>
+				<td>
+					<button data-record="{{x['Id']}}" id="deleteBtn" onclick="deleteInvoiceItem(this)" class="w3-btn w3-round w3-red"><i class="fa fa-remove"></i></button>
+				</td>
+			</tr>
+		{% endfor %}
+		<tr>
+			<td>Total</td><td>{% set total = invoiceItem | sum(attribute='Price__c') %} ({{'%0.2f'| format(total|float)}}) </td>
+		</tr>
+		<tr>
+			<td>
+				<label>Total Due</label>
+			</td>
+		</tr>
+
+		<tr>
+			<td><input type="text" name="" id="phone_no" value="{{booking['Phone__c']}}"></td>
+		</tr>
+		<tr>
+			<td><input type="text" name="" id="email" value="{{booking['Email__c']}}"></td>
+		</tr>
+		<tr>
+			<td><button style="width:150px;" class="w3-btn w3-round w3-blue" onclick="generateCustomerInvoice()">Generate Invoice</button></td>
+		</tr>
+	</table>
+	<input type="hidden" id="total" value="{{total}}">
+	<input type="hidden" id="tip" value="{{tip}}">
+
+	<div id="invoiceModal" class="w3-modal">
+		<div class="w3-modal-content" style="color: black;">
+		    <div class="w3-container">
+		      <div id="modalContent">
+
+		    </div>
+		</div>
+	  </div>
+	</div>
+	<script type="text/javascript">
+		
+	</script>
+</div>

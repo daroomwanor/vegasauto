@@ -1,0 +1,17 @@
+
+<div style="border-radius:5px; color: #e49607">
+	<table class="w3-table w3-black" style="color:#e49607 !important;">
+		<tr>
+			<th>Service</th><th>Description</th>
+		</tr>
+		{% for x in data %}
+			<tr>
+				<td>{{x['Name']}}</td><td>{{x['Description__c']}}</td>
+			</tr>
+		{% endfor %}
+	</table>
+	<div style="margin-top:5px; padding-left:122px; ">
+		<button style="border-radius: 5px;" onclick="document.getElementById('serviceTermModal').style.display='None'" class="w3-button w3-orange">Continue</button>
+	</div>
+</div>
+	

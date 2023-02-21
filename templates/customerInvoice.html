@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dispatcher</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/623f7f7009.js" crossorigin="anonymous"></script>
+</head>
+<body class="w3-content w3-black" style="max-width:100%">
+
+	<div class="w3-row" style="background-color: black;" id="home">
+		<input type="hidden" id="staffId">
+		<div class="w3-container w3-black">
+			<img src="/static/logo.png" style="margin-top:0px; height: 100px; width:150px;">
+			<div class="w3-display-container w3-black">
+				<table class="w3-table">
+					<tr>
+						<td>
+							Items
+						</td>
+						<td>
+							QTY
+						</td>
+						<td>
+							Price
+						</td>
+					</tr>
+					{% for x in invoiceItem %}
+						<tr>
+							<td>{{x['Name']}}</td><td>{{x['Quantity__c']}}</td><td>${{x['Price__c']}}</td>
+						</tr>
+					{% endfor %}
+				    <tr>
+						<td>Total</td>
+						<td></td>
+						<td>{% set total = invoiceItem | sum(attribute='Price__c') %} {{'%0.2f'| format(total|float)}} <input type="hidden" value="{{total}}" id="real_total"></td>
+					</tr>
+					<tr>
+						<td>
+							<button onclick="getTip(this)" data-record="0" class="w3-btn w3-round w3-small w3-disabled tipBtn">None</button>
+							<button onclick="getTip(this)" data-record="15" class="w3-btn w3-round w3-small w3-blue tipBtn">15%</button>
+							<button onclick="getTip(this)" data-record="20" class="w3-btn w3-round w3-small w3-gray tipBtn">20%</button>
+							<button onclick="getTip(this)" data-record="25" class="w3-btn w3-round w3-small w3-gray tipBtn">25%</button>
+						</td>
+						<td>
+							<td> <input type="text" id="tipInput" value="{% set tip = (15/100)*total %} {{'%0.2f'| format(tip|float)}}"></td>
+						</td>
+					</tr>
+					<tr>
+						<td>Payment Due</td>
+						<td></td>
+						<td>$<span id="payment_total">{% set pay_due = total+tip %} {{'%0.2f'| format(pay_due|float) }}</span></td>
+					</tr>
+				</table>
+				<table class="w3-table">
+					<tr>
+						<td>
+							{{invoiceItem[0]['Bookings__r']['Name']}}
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="checkbox" name="" id="terms" checked> I accept the above services and charges. Please use the Stripe Payment Link to pay invoice. 
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="text" id="send_phone_no" value="{{invoiceItem[0]['Bookings__r']['Phone__c']}}">
+						</td>
+					</tr>
+				</table>
+				<span class="w3-btn w3-round w3-blue" onclick="sendPaymentLink()">Send Payment Link</span>
+				<div id="paymentModal" class="w3-modal">
+					<div class="w3-modal-content" style="color: black;">
+					    <div class="w3-container">
+					      <div id="modalContent">
+
+					    </div>
+					</div>
+				  </div>
+				</div>
+			</div>
+
+			<script type="text/javascript">
+				function getTip(e){
+					var tip = e.getAttribute('data-record');
+					tipBtns = document.getElementsByClassName('tipBtn');
+					for(var x=0; x<tipBtns.length; x++){
+						tipBtns[x].classList.remove('w3-blue')
+						tipBtns[x].classList.add('w3-gray');
+					}
+					var total = document.getElementById('real_total').value;
+					var pay = (tip/100)*total
+					var total_payment = parseInt(pay) + parseInt(total);
+					document.getElementById("tipInput").value = pay;
+					console.log(total_payment);
+					document.getElementById("payment_total").innerHTML = total_payment;
+					e.classList.remove('w3-gray');
+					e.classList.add('w3-blue');
+				}
+
+				function sendPaymentLink(){
+					var phone = document.getElementById("send_phone_no").value;
+					var payment_total = document.getElementById('payment_total').innerHTML;
+					var bookingId = document.getElementById('bookingId').value;
+					var staffId = document.getElementById('staffId').value;
+					var data  = {
+						payment_total:payment_total,
+						bookingId:bookingId,
+						phone:phone
+					}
+					const xhttp = new XMLHttpRequest();
+					xhttp.onreadystatechange = function() {
+						if (this.readyState == 4 && this.status == 200) {
+							document.getElementById("paymentModal").style.display = "Block";
+							document.getElementById("modalContent").innerHTML = "A Stripe Payment Checkout Link has been sent to your phone, please checkout using the link.";
+					    }
+					}
+					xhttp.open("POST", "http://192.168.0.3:5000/generatePaymentLink");
+					xhttp.send(JSON.stringify(data));
+				}
+				
+			</script>
+			<input type="hidden" name="" id="bookingId" value="{{ invoiceItem[0]['Bookings__r']['Id']}}">
+			
+		</div>
+	</div>
+</body>
+</html>

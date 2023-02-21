@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Dispatcher</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://kit.fontawesome.com/623f7f7009.js" crossorigin="anonymous"></script>
+</head>
+<body class="w3-content w3-black" style="max-width:100%">
+<!-- First Grid: Logo & About -->
+
+	<div class="w3-row" style="background-color: black;" id="home">
+		<input type="hidden" id="staffId">
+		<div class="w3-container w3-black">
+			<img src="/static/logo.png" style="margin-top:0px; height: 100px; width:150px;">
+			<table class="w3-table">
+				<tr>
+					<td>
+						<select id="msgType">
+							<option value="promo">Promo</option>
+							<option value="invoice">Invoice</option>
+							<option value="password">Reset Password</option>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" id="name" placeholder="Name">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" id="phone" placeholder="Phone No.">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input value="20" type="number" id="promo_discount" placeholder="% OFF">
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<input type="text" id="promo_code" placeholder="AUTO-SPA-FREE" value="AUTO-SPA-FREE">
+					</td>
+				</tr>
+				
+				<tr>
+					<td>
+						<textarea id="msgBody" style="width:250Px; height: 150px;">
+							You have been Offered a Free Detail, <br>
+							Please use link below to Book NOW! <br>
+							<br>
+						</textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<a class="w3-btn w3-round w3-blue" href="/dispatcher"><i class='fa fa-home' style='font-size:24px'></i></a> <button class="w3-btn w3-round w3-orange" onclick="pushNotification()">Push</button>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div id="promoDataModal" class="w3-modal">
+	  		<div class="w3-modal-content" style="color: black;">
+		    <div class="w3-container">
+		      <div id="modalContent">
+		      	<h4>Send Text Message To Customer</h4>
+		      	<table>
+		      		<tr>
+						<td>
+							<span class="w3-btn w3-round w3-teal" type="text" id="d_name" placeholder="Name"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="w3-btn w3-round w3-teal" type="text" id="d_phone" placeholder="Phone No."></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="w3-btn w3-round w3-teal" value="20" type="number" id="d_promo_discount" placeholder="% OFF"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<span class="w3-btn w3-round w3-teal" type="text" id="d_promo_code" placeholder="AUTO-SPA-FREE"></span>
+						</td>
+					</tr>
+					
+					<tr>
+						<td>
+							<span class="w3-btn w3-round w3-teal" id="d_msgBody" style="width:100%; height: 150px;"></span>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<button class="w3-btn w3-round w3-red" onclick="document.getElementById('promoDataModal').style.display='None'">Cancel</button>
+							<button class="w3-btn w3-round w3-orange" onclick="pushNotificationAction()">Send</button>
+						</td>
+					</tr>
+		      	</table>
+
+		      </div>
+		    </div>
+			</div>
+		</div>
+
+
+		<script type="text/javascript">
+			function pushNotificationAction(){
+				name = document.getElementById('name').value;
+				phone = document.getElementById('phone').value;
+				promo_discount = document.getElementById('promo_discount').value;
+				promo_code = document.getElementById('promo_code').value;
+				msgBody = document.getElementById('msgBody').value;
+				msgType = document.getElementById('msgType').value;
+				const queryString = window.location.search;
+				const urlParams = new URLSearchParams(queryString);
+				data ={
+					name:name,
+					phone:phone,
+					promo_code:promo_code,
+					promo_discount:promo_discount,
+					msgBody:msgBody,
+					msgType:msgType
+				}
+
+				const xhttp = new XMLHttpRequest();
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4 && this.status == 200) {
+						window.location.href = "/promo?staffId="+urlParams.get('staffId')
+				    }
+				}
+				xhttp.open("POST", "http://192.168.0.3:5000/promo?staffId="+urlParams.get('staffId'));
+				xhttp.send(JSON.stringify(data));
+			}
+
+			function pushNotification(){
+				document.getElementById('d_name').innerHTML = document.getElementById('name').value;
+				document.getElementById('d_phone').innerHTML = document.getElementById('phone').value;
+				document.getElementById('d_promo_discount').innerHTML = document.getElementById('promo_discount').value;
+				document.getElementById('d_promo_code').innerHTML = document.getElementById('promo_code').value;
+				document.getElementById('d_msgBody').innerHTML = document.getElementById('msgBody').value;
+				if (document.getElementById('phone').value != ""){
+					document.getElementById('promoDataModal').style.display="Block";
+				}
+			}
+			
+		</script>
+</div>
+</body>
+</html>

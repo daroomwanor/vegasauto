@@ -1,0 +1,64 @@
+
+<div>
+	<h3>Manage Booking</h3>
+	{% set month = data['Month__c'] | int %}
+	<table class="w3-table w3-black">
+		<tr>
+			<td>Booking for: {{data['Name']}}</td>
+			
+		</tr>
+		<tr>
+			<td> Email: {{data['Email__c']}} </td>
+		</tr>
+		<tr>
+			<td> Phone: {{data['Phone__c']}} </td>
+		</tr>
+		<tr>
+			<td>Date/Time: {{timeZone[data['Time__c']]}} {{month}}/{{ data['Weekday__c']}}</td>
+		</tr>
+		<tr>
+			<td>Address: {{data['Address__c']}}</td>			
+		</tr>
+		<tr>
+			<td>City: {{data['City__c']}}</td>
+		<tr>
+			<td>Vehicle Type: {{data['Vehicle_Type__c']}}</td>			
+		</tr>
+		<tr>
+			<td>Preferred Service : {{data['Services__c']}}</td>			
+		</tr>
+		<tr>
+			<td> #. Vehicles: {{data['Vehicle_No__c']}}</td>
+		</tr>
+		<tr>
+			<td> Client Type : {{data['clientType__c']}}</td>
+		</tr>
+	</table>
+</div>
+<div>
+	<table>
+		<tr>
+			<td><button>Push Notifications {{data['Phone__c']}}  </button></td>
+			<td>
+				<select id ="msgType">
+					<option value="Reminder">Reminder</option>
+					<option value="Enroute">Enroute</option>
+					<option value="Reschedule">Reschedule</option>
+					<option value="Invoice">Invoice</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<textarea id="msgBody" style="width: 300px; height:250px;"></textarea>
+			</td>
+		</tr>
+	</table>
+	<button class="w3-btn w3-round w3-blue" onclick="pushSMS()">Push Message</button>
+</div>
+	<input type="hidden" id="bookingId" value="{{data['Id']}}">
+	<input type="hidden" id="staffId" value="{{staffId}}">
+	<input type="hidden" id="phone" value="{{data['Phone__c']}}">
+	<input type="hidden" id="time" value="{{timeZone[data['Time__c']]}} {{month}}/{{ data['Weekday__c']}}">
+	<input type="hidden" id="address" value="{{data['Address__c']}}">
+	<input type="hidden" id="name" value="{{data['Name']}}">

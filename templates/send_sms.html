@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+</head>
+<body>
+	<div>
+	<table>
+		<tr>
+			<th><input type="text" name="" id="phone" placeholder="Phone No."></th>
+		</tr>
+		<tr>
+			<th><textarea id="message"></textarea></th>
+		</tr>
+	</table>
+	<button onclick="sendSMS()">Send</button>
+	<script type="text/javascript">
+		function sendSMS(){
+			var phone = document.getElementById('phone').value;
+			var message = document.getElementById('message').value;
+			var data  = {
+				phone:phone,
+				message:message,
+			}
+			const xhttp = new XMLHttpRequest();
+			xhttp.onreadystatechange = function() {
+				if (this.readyState == 4 && this.status == 200) {
+					console.log(xhttp.responseText);
+			    }
+			    console.log(JSON.stringify(data)); 
+			}
+			xhttp.open("POST", "http://10.0.0.3:5000/send_sms");
+			xhttp.send(JSON.stringify(data));
+		}
+	</script>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+<tr>
+	{% for x in data %}
+		{% if current_time < x and day in [current_day] %}
+			<td><button class="all_time" onclick="setTimeSlot(this)"  style="float: left;" data-record="{{x}}">{{tmz[x]}}</button></td>
+		{% endif %}
+		{% if day != current_day %}
+			<td><button class="all_time" onclick="setTimeSlot(this)"  style="float: left;" data-record="{{x}}">{{tmz[x]}}</button></td>
+		{% endif %}
+	{% endfor %}
+</tr>
+
+	

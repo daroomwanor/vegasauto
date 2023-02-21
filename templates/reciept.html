@@ -1,0 +1,66 @@
+<div class="w3-container w3-black">
+	<table class="w3-table">
+		<tr>
+			<td>
+				Items
+			</td>
+			<td>
+				QTY
+			</td>
+			<td>
+				Price
+			</td>
+		</tr>
+		{% for x in invoiceItem %}
+			<tr>
+				<td>{{x['Name']}}</td><td>{{x['Quantity__c']}}</td><td>${{x['Price__c']}}</td>
+			</tr>
+		{% endfor %}
+	    <tr>
+			<td>Total</td>
+			<td></td>
+			<td>{% set total = invoiceItem | sum(attribute='Price__c') %} {{'%0.2f'| format(total|float)}} <input type="hidden" value="{{total}}" id="real_total"></td>
+		</tr>
+		<tr>
+			<td>
+				<button onclick="getTip(this)" data-record="0" class="w3-btn w3-round w3-small w3-disabled tipBtn">None</button>
+				<button onclick="getTip(this)" data-record="15" class="w3-btn w3-round w3-small w3-blue tipBtn">15%</button>
+				<button onclick="getTip(this)" data-record="20" class="w3-btn w3-round w3-small w3-gray tipBtn">20%</button>
+				<button onclick="getTip(this)" data-record="25" class="w3-btn w3-round w3-small w3-gray tipBtn">25%</button>
+			</td>
+			<td>
+				<td> <input type="text" id="tipInput" value="{% set tip = (15/100)*total %} {{'%0.2f'| format(tip|float)}}"></td>
+			</td>
+		</tr>
+		<tr>
+			<td>Payment Due</td>
+			<td></td>
+			<td>$<span id="payment_total">{% set pay_due = total+tip %} {{'%0.2f'| format(pay_due|float) }}</span></td>
+		</tr>
+	</table>
+	<table class="w3-table">
+		<tr>
+			<td>
+				{{invoiceItem[0]['Bookings__r']['Name']}}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="checkbox" name="" id="terms" checked> I accept the above services and charges. Please use the Stripe Payment Link to pay invoice. 
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<input type="text" id="send_phone_no" value="{{invoiceItem[0]['Bookings__r']['Phone__c']}}">
+			</td>
+		</tr>
+	</table>
+	<span class="w3-btn w3-round w3-blue" onclick="sendPaymentLink()">Send Payment Link</span>
+	<span class="w3-btn w3-round w3-blue" onclick="document.getElementById('invoiceModal').style.display='None'">Cancel</span>
+</div>
+
+<script type="text/javascript">
+	
+</script>
+
+<input type="hidden" name="" id="bookingId" value="{{ invoiceItem[0]['Bookings__r']['Id']}}">
